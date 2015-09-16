@@ -1,4 +1,13 @@
 #
+# ============================
+# Generic Makefile
+#
+# Author: alexander.paniutin@gmail.com
+#   Date: 2015-09-15
+#
+
+
+#
 # 'make depend' uses makedepend to automatically generate dependencies 
 #               (dependencies are added to end of Makefile)
 # 'make'        build executable file 'mycc'
@@ -12,26 +21,36 @@ CC = g++
 CFLAGS = -Wall -g
 DEFINES =
 
+# define any src or obj folders you will work with
+#
+SRCDIR = src
+OBJDIR = obj
+OUTDIR = output
+
 # define any 3'rd party components
 #
-GTEST = ../thirdParty/GTest
+GTEST = thirdParty/GTest
 
 # define any directories containing header files other than /usr/include
 #
-INCLUDES = -I$(GTEST)/include
+# -I<include_path>
+INCLUDES =
 
 # define library paths in addition to /usr/lib
 #   if I wanted to include libraries not in /usr/lib I'd specify
 #   their path using -Lpath, something like:
-LFLAGS = -L$(GTEST)/lib
+# -L<lib_path>
+LFLAGS = 
 
 # define any libraries to link into executable:
 #   if I want to link in libraries (libx.so or libx.a) I use the -llibname 
 #   option, something like (this will link in libmylib.so and libm.so:
-LIBS = -lgtest
+# -l<lib_name>
+LIBS =
 
 # define the C source files
-SRCS = Add.cpp Add_gtest.cpp
+SRCS = $(SRCDIR)/Add.cpp
+SRCS_GTEST = $(SRCDIR)/Add_gtest.cpp
 
 # define the C object files 
 #
@@ -42,6 +61,8 @@ SRCS = Add.cpp Add_gtest.cpp
 # with the .o suffix
 #
 OBJS = $(SRCS:.cpp=.o)
+OBJS_GTEST = $(SRCS_GTEST:.cpp=.o)
+OBJS_TEST =
 
 # define the executable file 
 MAIN = my_add
@@ -58,10 +79,17 @@ all:    $(MAIN)
 	@echo  The Demo of GTest library has been compiled. the executable is $(MAIN)
 
 wgtest: DEFINES += -DGTEST
-wgtest: all
+wgtest: INCLUDES += -I$(GTEST)/include
+wgtest: LFLAGS += -L$(GTEST)/lib
+wgtest: LIBS += -lgtest
+wgtest: OBJS_TEST += $(OBJS_GTEST)
+wgtest: $(OBJS_GTEST)
+wgtest: $(MAIN)
+wgtest:
+	echo Done!
 	
 $(MAIN): $(OBJS) 
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+	$(CC) $(CFLAGS) -o $(MAIN) $(OBJS) $(OBJS_TEST) $(LFLAGS) $(LIBS)
 
 # this is a suffix replacement rule for building .o's from .cpp's
 # it uses automatic variables $<: the name of the prerequisite of
@@ -71,7 +99,7 @@ $(MAIN): $(OBJS)
 	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -c $<  -o $@
 
 clean:
-	$(RM) *.o *~ $(MAIN) *test_results.xml
+	$(RM) $(SRCDIR)/*.o $(SRCDIR)/*~ $(MAIN) *test_results.xml
 
 depend: $(SRCS)
 	makedepend $(INCLUDES) $^
