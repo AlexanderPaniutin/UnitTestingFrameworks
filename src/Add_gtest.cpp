@@ -30,8 +30,10 @@ TEST(Add, AddDowntoMin)
     EXPECT_EQ(-2147483648, add(-8, -2147483640));
 }
 
+/*
 TEST(Add, ExpectToFail)
 {
     EXPECT_EQ(0, add(1, 0));
     EXPECT_EQ(5, add(10, 15));
 }
+*/
