@@ -10,6 +10,7 @@ CC = g++
 
 # define any compile-time flags
 CFLAGS = -Wall -g
+DEFINES =
 
 # define any 3'rd party components
 #
@@ -30,7 +31,7 @@ LFLAGS = -L$(GTEST)/lib
 LIBS = -lgtest
 
 # define the C source files
-SRCS = demo_gtest.cpp demo_gtest_test.cpp
+SRCS = Add.cpp Add_gtest.cpp
 
 # define the C object files 
 #
@@ -43,7 +44,7 @@ SRCS = demo_gtest.cpp demo_gtest_test.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 # define the executable file 
-MAIN = demo_gtest
+MAIN = my_add
 
 #
 # The following part of the makefile is generic; it can be used to 
@@ -56,18 +57,21 @@ MAIN = demo_gtest
 all:    $(MAIN)
 	@echo  The Demo of GTest library has been compiled. the executable is $(MAIN)
 
+wgtest: DEFINES += -DGTEST
+wgtest: all
+	
 $(MAIN): $(OBJS) 
 	$(CC) $(CFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
 
-# this is a suffix replacement rule for building .o's from .c's
+# this is a suffix replacement rule for building .o's from .cpp's
 # it uses automatic variables $<: the name of the prerequisite of
-# the rule(a .c file) and $@: the name of the target of the rule (a .o file) 
+# the rule(a .cpp file) and $@: the name of the target of the rule (a .o file) 
 # (see the gnu make manual section about automatic variables)
 .cpp.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<  -o $@
+	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -c $<  -o $@
 
 clean:
-	$(RM) *.o *~ $(MAIN)
+	$(RM) *.o *~ $(MAIN) *test_results.xml
 
 depend: $(SRCS)
 	makedepend $(INCLUDES) $^
