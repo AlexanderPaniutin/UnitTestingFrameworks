@@ -22,15 +22,19 @@ INC         := -I$(INCDIR)
 INCDEP      := -I$(INCDIR)
 
 TEST_OBJ    :=
+
 GTEST_DIR   := thirdParty/GTest
 GTEST_SRC   := $(shell find $(SRCDIR) -type f -name *_gtest.$(SRCEXT))
 GTEST_OBJ   := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(GTEST_SRC:.$(SRCEXT)=.$(OBJEXT)))
 
+CUTEST_DIR  := thirdParty/CppUnit
+CUTEST_SRC  := $(shell find $(SRCDIR) -type f -name *_cutest.$(SRCEXT))
+CUTEST_OBJ  := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CUTEST_SRC:.$(SRCEXT)=.$(OBJEXT)))
 
 #---------------------------------------------------------------------------------
 #DO NOT EDIT BELOW THIS LINE
 #---------------------------------------------------------------------------------
-SOURCES     := $(shell find $(SRCDIR) -type f ! -name *_gtest.$(SRCEXT) -name *.$(SRCEXT))
+SOURCES     := $(shell find $(SRCDIR) -type f ! -name *_gtest.$(SRCEXT) ! -name *_cutest.$(SRCEXT) -name *.$(SRCEXT))
 OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
 
 #Defauilt Make
@@ -45,10 +49,20 @@ wgtest: LIB     += -L$(GTEST_DIR)/lib -lgtest
 wgtest: all
 wgtest:
 	@echo Done
-	@echo $(TEST_OBJ)
-	
+
+wcutest: $(CUTEST_OBJ)
+wcutest: OBJECTS += $(CUTEST_OBJ)
+wcutest: CFLAGS  += -DCUTEST
+wcutest: INC     += -I$(CUTEST_DIR)/include
+wcutest: LIB     += -L$(CUTEST_DIR)/lib -lcppunit
+wcutest: all
+wcutest:
+	@echo Done
+	@echo $(CUTEST_SRC)
+	@echo $(CUTEST_OBJ)
+
 #Remake
-remake: cleaner all
+remake: clean all
 
 #Copy Resources from Resources Directory to Target Directory
 resources: directories
