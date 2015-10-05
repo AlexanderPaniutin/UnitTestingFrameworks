@@ -8,6 +8,7 @@
 
 #ifdef GTEST
     #include <gtest/gtest.h>
+    #include "Complex_gtest.h"
 #endif
 
 
