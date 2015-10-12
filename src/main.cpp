@@ -53,7 +53,7 @@ runner.run(testresult);
     compileroutputter.write ();
  
     // Output XML for Jenkins CPPunit plugin
-    std::ofstream xmlFileOut("main_cutest_results.xml");
+    std::ofstream xmlFileOut("main_cutest_results_unformatted.xml");
     CppUnit::XmlOutputter xmlOut(&collectedresults, xmlFileOut);
     xmlOut.write();
  
