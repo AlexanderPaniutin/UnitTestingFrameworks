@@ -3,6 +3,11 @@
 #ifdef CUTEST
     #include <cppunit/extensions/TestFactoryRegistry.h>
     #include <cppunit/ui/text/TestRunner.h>
+    #include <cppunit/TestResult.h>
+    #include <cppunit/TestResultCollector.h>
+    #include <cppunit/BriefTestProgressListener.h>
+    #include <cppunit/CompilerOutputter.h>
+    #include <cppunit/XmlOutputter.h>
     #include "Complex_cutest.h"
 #endif
 
@@ -22,12 +27,39 @@ int main(int argc, char** argv)
 #ifdef CUTEST
     CPPUNIT_TEST_SUITE_REGISTRATION( ComplexTest );
 
-    CppUnit::TextUi::TestRunner runner;
-    CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
-    runner.addTest( registry.makeTest() );
+    // informs test-listener about testresults
+    CppUnit::TestResult testresult;
+ 
+    // register listener for collecting the test-results
+    CppUnit::TestResultCollector collectedresults;
+    testresult.addListener (&collectedresults);
+ 
+    // register listener for per-test progress output
+    CppUnit::BriefTestProgressListener progress;
+    testresult.addListener (&progress);
 
-    runner.run();
-    //bool wasSuccessful = runner.run( "", false );
+CppUnit::TextUi::TestRunner runner;
+CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
+runner.addTest( registry.makeTest() );
+runner.run(testresult);
+ 
+    // insert test-suite at test-runner by registry
+    //CppUnit::TestRunner testrunner;
+    //testrunner.addTest (TestFactoryRegistry::getRegistry().makeTest ());
+    //testrunner.run(testresult);
+ 
+    // output results in compiler-format
+    CppUnit::CompilerOutputter compileroutputter(&collectedresults, std::cerr);
+    compileroutputter.write ();
+ 
+    // Output XML for Jenkins CPPunit plugin
+    std::ofstream xmlFileOut("main_cutest_results.xml");
+    CppUnit::XmlOutputter xmlOut(&collectedresults, xmlFileOut);
+    xmlOut.write();
+ 
+    // return 0 if tests were successful
+    return collectedresults.wasSuccessful() ? 0 : 1;
+
 #endif
 
     std::cout << "regural app is runing..." << std::endl;
