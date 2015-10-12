@@ -38,22 +38,17 @@ int main(int argc, char** argv)
     CppUnit::BriefTestProgressListener progress;
     testresult.addListener (&progress);
 
-CppUnit::TextUi::TestRunner runner;
-CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
-runner.addTest( registry.makeTest() );
-runner.run(testresult);
- 
-    // insert test-suite at test-runner by registry
-    //CppUnit::TestRunner testrunner;
-    //testrunner.addTest (TestFactoryRegistry::getRegistry().makeTest ());
-    //testrunner.run(testresult);
+    CppUnit::TextUi::TestRunner runner;
+    CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
+    runner.addTest( registry.makeTest() );
+    runner.run(testresult);
  
     // output results in compiler-format
     CppUnit::CompilerOutputter compileroutputter(&collectedresults, std::cerr);
     compileroutputter.write ();
  
     // Output XML for Jenkins CPPunit plugin
-    std::ofstream xmlFileOut("main_cutest_results_unformatted.xml");
+    std::ofstream xmlFileOut("tests/main_cutest_results_unformatted.xml");
     CppUnit::XmlOutputter xmlOut(&collectedresults, xmlFileOut);
     xmlOut.write();
  
